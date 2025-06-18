@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Shadler (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Shadler (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

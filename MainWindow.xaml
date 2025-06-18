@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="Shadler.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Shadler"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Shadler">
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+
+    <Grid>
+
+        <NavigationView PaneDisplayMode="Left" CompactModeThresholdWidth="2000" ExpandedModeThresholdWidth="2000" SelectionChanged="NavBar_SelectionChanged" Margin="12">
+
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="Browse" Icon="Library" Tag="Views.Browser" />
+                <NavigationViewItem Content="History" Icon="Flag" Tag="Views.History"/>
+                <NavigationViewItem Content="Favorites" Icon="Favorite" Tag="Views.Favorite" />
+                <NavigationViewItem Content="Downloads" Icon="Download" Tag="Views.Download" />
+            </NavigationView.MenuItems>
+            <Frame x:Name="ContentFrame" />
+
+        </NavigationView>
+
+    </Grid>
+    
+</Window>
