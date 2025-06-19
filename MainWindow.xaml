@@ -15,12 +15,12 @@
 
     <Grid>
 
-        <NavigationView PaneDisplayMode="Left" CompactModeThresholdWidth="2000" ExpandedModeThresholdWidth="2000" SelectionChanged="NavBar_SelectionChanged" Margin="12">
+        <NavigationView PaneDisplayMode="Left" SelectionChanged="NavBar_SelectionChanged" Margin="12">
 
             <NavigationView.MenuItems>
                 <NavigationViewItem Content="Browse" Icon="Library" Tag="Views.Browser" />
-                <NavigationViewItem Content="History" Icon="Flag" Tag="Views.History"/>
-                <NavigationViewItem Content="Favorites" Icon="Favorite" Tag="Views.Favorite" />
+                <NavigationViewItem Content="History" Icon="Refresh" Tag="Views.History" />
+                    <NavigationViewItem Content="Favorites" Icon="Favorite" Tag="Views.Favorite" />
                 <NavigationViewItem Content="Downloads" Icon="Download" Tag="Views.Download" />
             </NavigationView.MenuItems>
             <Frame x:Name="ContentFrame" />
