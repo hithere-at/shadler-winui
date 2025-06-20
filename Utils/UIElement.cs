@@ -14,11 +14,13 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 
+using Shadler.DataStructure;
+
 namespace Shadler.UI
 {
     public static class ShadlerUIElement
     {
-        public static Button CreateContentButton(string title, string year, string url)
+        public static ShadlerContent CreateShadlerContent(string id, string title, string year, string url, string tag)
         {
             // main items
             // content banner
@@ -31,10 +33,22 @@ namespace Shadler.UI
             };
 
             // content title
+            // very stupid hack because manga author cant make a proper title lmaooooooo
+            // seriously, what the heck is ryoushin no shakkin wo katagawari shite morau jouken bla bla :sob: (good manga btw, very sweet)
+            // 
+            string shortTitle = title;
+
+            if (title.Length > 22)
+            {
+                shortTitle = title.Substring(0, 19) + "...";
+            }
+
             TextBlock contentTitle = new TextBlock
             {
-                Text = title,
+                Text = shortTitle,
+                TextWrapping = TextWrapping.WrapWholeWords,
                 FontSize = 15,
+                Margin = new Thickness(4, 0, 4, 0),
                 HorizontalAlignment = HorizontalAlignment.Center
             };
 
@@ -58,11 +72,20 @@ namespace Shadler.UI
 
             Button button = new Button
             {
+                Width = 200,
+                Height = 300,
                 Content = baseLayout,
-                Margin = new Thickness(0,0,12,0)
+                Margin = new Thickness(0, 0, 12, 12),
+                Tag = tag
             };
 
-            return button;
+            return new ShadlerContent {
+                Button = button,
+                Id = id,
+                Title = title,
+                Year = year,
+                ThumbnailUrl = url
+            };
         }
     }
 }

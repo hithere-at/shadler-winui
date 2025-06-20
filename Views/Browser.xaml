@@ -12,6 +12,7 @@
         
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -30,11 +31,10 @@
             
         </Grid>
 
-        <Grid Margin="12" Grid.Row="1">
-            <VariableSizedWrapGrid Orientation="Horizontal" x:Name="ContentGrid">
+        <VariableSizedWrapGrid Grid.Row="1" Margin="12" Orientation="Horizontal" x:Name="ContentGrid">
+        </VariableSizedWrapGrid>
 
-            </VariableSizedWrapGrid>
-        </Grid>
+        <Frame Grid.Row="1" x:Name="ContentViewerFrame" />
 
     </Grid>
 

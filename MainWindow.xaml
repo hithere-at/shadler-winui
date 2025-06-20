@@ -23,7 +23,8 @@
                     <NavigationViewItem Content="Favorites" Icon="Favorite" Tag="Views.Favorite" />
                 <NavigationViewItem Content="Downloads" Icon="Download" Tag="Views.Download" />
             </NavigationView.MenuItems>
-            <Frame x:Name="ContentFrame" />
+            
+            <Frame Grid.Row="1" x:Name="ContentFrame" />
 
         </NavigationView>
 
