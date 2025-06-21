@@ -15,22 +15,31 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 
 using Shadler.DataStructure;
-
 namespace Shadler.UI
 {
     public static class ShadlerUIElement
     {
-        public static ShadlerContent CreateShadlerContent(string id, string title, string year, string url, string tag)
+        public static Button CreateShadlerContent(string title, string year, BitmapImage image, string tag)
         {
             // main items
             // content banner
             Image contentImage = new Image
             {
-                Source = new BitmapImage(new Uri(url)),
+                Source = image,
+                Stretch = Stretch.UniformToFill,
+            };
+
+            // border
+            Border contentImageContainer = new Border
+            {
                 Width = 150,
                 Height = 240,
                 HorizontalAlignment = HorizontalAlignment.Center,
+                CornerRadius = new CornerRadius(5),
+                Margin = new Thickness(0, 0, 0, 9),
             };
+
+            contentImageContainer.Child = contentImage;
 
             // content title
             // very stupid hack because manga author cant make a proper title lmaooooooo
@@ -66,7 +75,7 @@ namespace Shadler.UI
                 Orientation = Orientation.Vertical
             };
 
-            baseLayout.Children.Add(contentImage);
+            baseLayout.Children.Add(contentImageContainer);
             baseLayout.Children.Add(contentTitle);
             baseLayout.Children.Add(contentYear);
 
@@ -79,13 +88,7 @@ namespace Shadler.UI
                 Tag = tag
             };
 
-            return new ShadlerContent {
-                Button = button,
-                Id = id,
-                Title = title,
-                Year = year,
-                ThumbnailUrl = url
-            };
+            return button;
         }
     }
 }

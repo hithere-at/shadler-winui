@@ -1,10 +1,11 @@
-using ABI.System;
+using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.VisualBasic;
 using System;
@@ -35,6 +36,7 @@ namespace Shadler.Views
     {
         string contentType = "Anime";
         List<ShadlerContent> shadlerContents = new List<ShadlerContent>();
+        
         public Browser()
         {
             this.InitializeComponent();
@@ -42,7 +44,6 @@ namespace Shadler.Views
 
         private async void Search_Query(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            Console.WriteLine("Search_Query called");
             string query = sender.Text;
             
             if (string.IsNullOrEmpty(query))
@@ -56,21 +57,20 @@ namespace Shadler.Views
 
             using (HttpClient client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0");
-                client.DefaultRequestHeaders.Add("Referer", "https://allmanga.to");
-                string url;
+                ShadlerHttp.SetDefaultHeader(client);
+
+                string queryUrl;
 
                 if (contentType == "Anime")
                 {
-                    url = Shadler.Utils.Anime.GetQueryUrl(query);
+                    queryUrl = Anime.GetQueryUrl(query);
                 }
                 else
                 {
-                    url = Shadler.Utils.Manga.GetQueryUrl(query);
+                    queryUrl = Manga.GetQueryUrl(query);
                 }
 
-                Console.WriteLine($"Requesting URL: {url}");
-                HttpResponseMessage response = await client.GetAsync(url);
+                HttpResponseMessage response = await client.GetAsync(queryUrl);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -78,9 +78,10 @@ namespace Shadler.Views
                     using (JsonDocument doc = JsonDocument.Parse(responseData))
                     {
                         string what = contentType == "Anime" ? "shows" : "mangas";
+                        int count = 0;
+
                         JsonElement root = doc.RootElement;
                         JsonElement contentResults = root.GetProperty("data").GetProperty(what).GetProperty("edges");
-                        int count = 0;
 
                         ContentViewerFrame.BackStack.Clear();
                         ContentViewerFrame.Content = null;
@@ -89,12 +90,22 @@ namespace Shadler.Views
 
                         foreach (JsonElement content in contentResults.EnumerateArray())
                         {
+
                             string id = content.GetProperty("_id").GetString();
-                            string thumbnailPath = content.GetProperty("thumbnail").GetString();
-                            thumbnailPath = !(thumbnailPath.StartsWith("https://")) ? "https://aln.youtube-anime.com/" + thumbnailPath : thumbnailPath;
                             string title = content.GetProperty("name").GetString();
-                            JsonElement date = content.GetProperty("airedStart");   
                             string year;
+
+                            string thumbnailUrl = content.GetProperty("thumbnail").GetString();
+                            thumbnailUrl = !(thumbnailUrl.StartsWith("https://"))
+                                ? "https://aln.youtube-anime.com/" + thumbnailUrl
+                                : thumbnailUrl;
+
+                            string detailUrl = contentType == "Anime"
+                                ? Anime.GetDetailUrl(content.GetProperty("_id").GetString())
+                                : Manga.GetDetailUrl(content.GetProperty("_id").GetString());
+
+
+                            JsonElement date = content.GetProperty("airedStart");   
 
                             if (date.TryGetProperty("year", out JsonElement yearElement))
                             {
@@ -104,9 +115,13 @@ namespace Shadler.Views
                                 year = " ";
                             }
 
-                            ShadlerContent currContent = ShadlerUIElement.CreateShadlerContent(id, title, year, thumbnailPath, count.ToString());
-                            currContent.Button.Click += SelectContent_Event;
-                            ContentGrid.Children.Add(currContent.Button);
+                            BitmapImage thumbnailImage = new BitmapImage(new Uri(thumbnailUrl));
+
+                            Button currContentButton = ShadlerUIElement.CreateShadlerContent(title, year, thumbnailImage, count.ToString());
+                            ShadlerContent currContent = new ShadlerContent(contentType, id, title, year, thumbnailImage, detailUrl);
+
+                            currContentButton.Click += SelectContent_Event;
+                            ContentGrid.Children.Add(currContentButton);
                             shadlerContents.Add(currContent);
 
                             count++;
