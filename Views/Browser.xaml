@@ -12,7 +12,6 @@
         
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -27,12 +26,13 @@
                 </DropDownButton.Flyout>
             </DropDownButton>
 
-            <AutoSuggestBox TextChanged="Search_Query" PlaceholderText="Search.." QueryIcon="Find" Width="300" HorizontalAlignment="Right" />
+            <AutoSuggestBox x:Name="QueryBox"  QuerySubmitted="Search_QuerySubmitted" TextChanged="Search_TextChanged" PlaceholderText="Search.." QueryIcon="Find" Width="270" HorizontalAlignment="Right" />
             
         </Grid>
 
-        <VariableSizedWrapGrid Grid.Row="1" Margin="12" Orientation="Horizontal" x:Name="ContentGrid">
-        </VariableSizedWrapGrid>
+        <ScrollViewer Grid.Row="1">
+            <VariableSizedWrapGrid Grid.Row="1" Margin="12" Orientation="Horizontal" x:Name="ContentGrid" />
+        </ScrollViewer>
 
         <Frame Grid.Row="1" x:Name="ContentViewerFrame" />
 

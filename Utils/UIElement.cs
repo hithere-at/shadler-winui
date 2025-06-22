@@ -15,6 +15,7 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 
 using Shadler.DataStructure;
+
 namespace Shadler.UI
 {
     public static class ShadlerUIElement
@@ -35,7 +36,7 @@ namespace Shadler.UI
                 Width = 150,
                 Height = 240,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                CornerRadius = new CornerRadius(5),
+                CornerRadius = new CornerRadius(8),
                 Margin = new Thickness(0, 0, 0, 9),
             };
 
@@ -89,6 +90,63 @@ namespace Shadler.UI
             };
 
             return button;
+        }
+
+        public static Grid CreateShadlersEpisodeButton(string episode, string tag)
+        {
+            Grid episodeViewerGrid = new Grid
+            {
+                CornerRadius = new CornerRadius(4),
+                Margin = new Thickness(0, 6, 0, 0),
+                Background = new SolidColorBrush(Windows.UI.Color.FromArgb(0x0F, 0xFF, 0x0FF, 0x0FF))
+            };
+
+            episodeViewerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(0, GridUnitType.Auto) });
+            episodeViewerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            episodeViewerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2, GridUnitType.Auto) });
+
+            TextBlock episodeString = new TextBlock
+            {
+                Margin = new Thickness(12, 0, 0, 0),
+                Text = "Episode " + episode,
+                FontSize = 14,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            Button playButton = new Button
+            {
+                Tag = tag,
+                Margin = new Thickness(0, 12, 12, 12),
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Content = new FontIcon
+                {
+                    FontFamily = new FontFamily("Segoe Fluent Icons"),
+                    Glyph = "\uE768"
+                }
+            };
+
+            Button downloadButton = new Button
+            {
+                Tag = tag,
+                Margin = new Thickness(0, 12, 12, 12),
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Content = new FontIcon
+                {
+                    FontFamily = new FontFamily("Segoe Fluent Icons"),
+                    Glyph = "\uE896"
+                }
+            };
+
+            Grid.SetColumn(episodeString, 0);
+            Grid.SetColumn(playButton, 1);
+            Grid.SetColumn(downloadButton, 2);
+
+            episodeViewerGrid.Children.Add(episodeString);
+            episodeViewerGrid.Children.Add(playButton);
+            episodeViewerGrid.Children.Add(downloadButton);
+
+            return episodeViewerGrid;
         }
     }
 }

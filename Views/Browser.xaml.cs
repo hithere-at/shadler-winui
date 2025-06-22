@@ -7,8 +7,8 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.VisualBasic;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -34,7 +34,8 @@ namespace Shadler.Views
     /// </summary>
     public sealed partial class Browser : Page
     {
-        string contentType = "Anime";
+        string currentContentType = "Anime";
+        string currentQuery;
         List<ShadlerContent> shadlerContents = new List<ShadlerContent>();
         
         public Browser()
@@ -42,10 +43,23 @@ namespace Shadler.Views
             this.InitializeComponent();
         }
 
-        private async void Search_Query(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private void Search_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            string query = sender.Text;
-            
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                currentQuery = sender.Text;
+                Search_Query(currentQuery);
+            }
+        }
+
+        private void Search_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            Search_Query(args.QueryText);
+        }
+
+        private async void Search_Query(string query)
+        {
+
             if (string.IsNullOrEmpty(query))
             {
                 ContentViewerFrame.BackStack.Clear();
@@ -61,7 +75,7 @@ namespace Shadler.Views
 
                 string queryUrl;
 
-                if (contentType == "Anime")
+                if (currentContentType == "Anime")
                 {
                     queryUrl = Anime.GetQueryUrl(query);
                 }
@@ -77,16 +91,26 @@ namespace Shadler.Views
                     string responseData = await response.Content.ReadAsStringAsync();
                     using (JsonDocument doc = JsonDocument.Parse(responseData))
                     {
-                        string what = contentType == "Anime" ? "shows" : "mangas";
+                        string what = currentContentType == "Anime" ? "shows" : "mangas";
                         int count = 0;
 
                         JsonElement root = doc.RootElement;
-                        JsonElement contentResults = root.GetProperty("data").GetProperty(what).GetProperty("edges");
+                        JsonElement contentResults;
 
                         ContentViewerFrame.BackStack.Clear();
                         ContentViewerFrame.Content = null;
                         ContentGrid.Children.Clear();
                         shadlerContents.Clear();
+
+                        if (root.TryGetProperty("data", out contentResults))
+                        {
+                            contentResults = contentResults.GetProperty(what).GetProperty("edges");
+                        }
+                        else
+                        {
+                            // silently fail if the data doesnt exist because API not API'ing
+                            return;
+                        }
 
                         foreach (JsonElement content in contentResults.EnumerateArray())
                         {
@@ -100,7 +124,7 @@ namespace Shadler.Views
                                 ? "https://aln.youtube-anime.com/" + thumbnailUrl
                                 : thumbnailUrl;
 
-                            string detailUrl = contentType == "Anime"
+                            string detailUrl = currentContentType == "Anime"
                                 ? Anime.GetDetailUrl(content.GetProperty("_id").GetString())
                                 : Manga.GetDetailUrl(content.GetProperty("_id").GetString());
 
@@ -118,7 +142,7 @@ namespace Shadler.Views
                             BitmapImage thumbnailImage = new BitmapImage(new Uri(thumbnailUrl));
 
                             Button currContentButton = ShadlerUIElement.CreateShadlerContent(title, year, thumbnailImage, count.ToString());
-                            ShadlerContent currContent = new ShadlerContent(contentType, id, title, year, thumbnailImage, detailUrl);
+                            ShadlerContent currContent = new ShadlerContent(currentContentType, id, title, year, thumbnailImage, detailUrl);
 
                             currContentButton.Click += SelectContent_Event;
                             ContentGrid.Children.Add(currContentButton);
@@ -145,23 +169,36 @@ namespace Shadler.Views
 
         private void ContentMenu_Click(object sender, RoutedEventArgs args)
         {
-            ContentViewerFrame.BackStack.Clear();
-            ContentViewerFrame.Content = null;
-            ContentGrid.Children.Clear();
 
             if (sender is MenuFlyoutItem item)
             {
-                switch (item.Text)
+                if (item.Text == currentContentType)
                 {
-                    case "Anime":
-                        contentType = "Anime";
-                        ContentTypeDropDown.Content = "Anime";
-                        break;
+                    return; // dont reload if the selected content type is the same as the current one
 
-                    case "Manga":
-                        contentType = "Manga";
-                        ContentTypeDropDown.Content = "Manga"; 
-                        break;
+                } else {
+
+                    ContentViewerFrame.BackStack.Clear();
+                    ContentViewerFrame.Content = null;
+                    ContentGrid.Children.Clear();
+                    shadlerContents.Clear();
+
+                    switch (item.Text)
+                    {
+                        case "Anime":
+                            currentContentType = "Anime";
+                            break;
+
+                        case "Manga":
+                            currentContentType = "Manga";
+                            break;
+
+                        default:
+                            return;
+                    }
+
+                    Search_Query(currentQuery);
+
                 }
             }
         }
@@ -174,7 +211,7 @@ namespace Shadler.Views
             { 
                 int index = int.Parse(shadlerContentButton.Tag.ToString());
 
-                ContentViewerFrame.Navigate(typeof(ContentViewer), shadlerContents[index]);
+                ContentViewerFrame.Navigate(typeof(ContentViewer), shadlerContents[index], new EntranceNavigationTransitionInfo());
 
             }
 

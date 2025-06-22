@@ -20,6 +20,7 @@ using Microsoft.UI.Xaml.Media.Imaging;
 
 using Shadler.DataStructure;
 using Shadler.Utils;
+using Shadler.UI;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -65,6 +66,7 @@ namespace Shadler.Views
                     using (JsonDocument doc = JsonDocument.Parse(responseData))
                     {
                         string contentIdentifierWhyCantTheyJustHaveAStableAPI = currentContent.ContentType == "Anime" ? "show" : "manga";
+                        int count = 0;
 
                         JsonElement root = doc.RootElement;
                         string contentDesciption = root
@@ -74,6 +76,18 @@ namespace Shadler.Views
 
                         ContentDescription.Text = WebUtility.HtmlDecode(contentDesciption).Replace("<br>", "");
 
+                        JsonElement episodeStrings = root
+                            .GetProperty("data")
+                            .GetProperty(contentIdentifierWhyCantTheyJustHaveAStableAPI)
+                            .GetProperty("availableEpisodesDetail")
+                            .GetProperty("sub");
+
+                        foreach (JsonElement episode in episodeStrings.EnumerateArray())
+                        {
+                            Console.WriteLine(episode.ToString());
+                            EpisodeSelector.Children.Add(ShadlerUIElement.CreateShadlersEpisodeButton(episode.ToString(), count.ToString()));
+                            count++;
+                        }
                     }
                 }
 
