@@ -151,9 +151,7 @@ namespace Shadler.Views
                             count++;
                         }
                     }
-
                 }
-
                 else
                 {
                     ContentGrid.Children.Add(new TextBlock
@@ -187,10 +185,12 @@ namespace Shadler.Views
                     {
                         case "Anime":
                             currentContentType = "Anime";
+                            ContentTypeDropDown.Content = "Anime";
                             break;
 
                         case "Manga":
                             currentContentType = "Manga";
+                            ContentTypeDropDown.Content = "Manga";
                             break;
 
                         default:

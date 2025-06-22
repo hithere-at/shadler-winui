@@ -92,7 +92,7 @@ namespace Shadler.UI
             return button;
         }
 
-        public static Grid CreateShadlersEpisodeButton(string episode, string tag)
+        public static Grid CreateShadlerEpisodeButton(string episode)
         {
             Grid episodeViewerGrid = new Grid
             {
@@ -116,7 +116,7 @@ namespace Shadler.UI
 
             Button playButton = new Button
             {
-                Tag = tag,
+                Tag = episode,
                 Margin = new Thickness(0, 12, 12, 12),
                 HorizontalAlignment = HorizontalAlignment.Right,
                 Content = new FontIcon
@@ -128,7 +128,7 @@ namespace Shadler.UI
 
             Button downloadButton = new Button
             {
-                Tag = tag,
+                Tag = episode,
                 Margin = new Thickness(0, 12, 12, 12),
                 HorizontalAlignment = HorizontalAlignment.Right,
                 Content = new FontIcon

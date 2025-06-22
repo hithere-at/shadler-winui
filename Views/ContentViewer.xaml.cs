@@ -37,6 +37,9 @@ namespace Shadler.Views
             this.InitializeComponent();
         }
 
+        List<List<string>> episodePages = new List<List<string>>();
+        int pageIndex = 0;
+
         protected override async void OnNavigatedTo(NavigationEventArgs args) {
 
             base.OnNavigatedTo(args);
@@ -66,6 +69,7 @@ namespace Shadler.Views
                     using (JsonDocument doc = JsonDocument.Parse(responseData))
                     {
                         string contentIdentifierWhyCantTheyJustHaveAStableAPI = currentContent.ContentType == "Anime" ? "show" : "manga";
+                        string contentEpisodesChaptersWhatever = currentContent.ContentType == "Anime" ? "availableEpisodesDetail" : "availableChaptersDetail";
                         int count = 0;
 
                         JsonElement root = doc.RootElement;
@@ -79,14 +83,28 @@ namespace Shadler.Views
                         JsonElement episodeStrings = root
                             .GetProperty("data")
                             .GetProperty(contentIdentifierWhyCantTheyJustHaveAStableAPI)
-                            .GetProperty("availableEpisodesDetail")
+                            .GetProperty(contentEpisodesChaptersWhatever)
                             .GetProperty("sub");
+
+                        int episodesLength = episodeStrings.GetArrayLength() - 1;
+                        List<string> pageHelper = new List<string>();
 
                         foreach (JsonElement episode in episodeStrings.EnumerateArray())
                         {
-                            Console.WriteLine(episode.ToString());
-                            EpisodeSelector.Children.Add(ShadlerUIElement.CreateShadlersEpisodeButton(episode.ToString(), count.ToString()));
+                            pageHelper.Add(episode.ToString());
+
+                            if ((count != 0 && count % 15 == 0) || count == episodesLength)
+                            {
+                                episodePages.Add(new List<string>(pageHelper));
+                                pageHelper.Clear();
+                            }
+
                             count++;
+                        }
+
+                        foreach (string episodeString in episodePages[0])
+                        {
+                            EpisodeSelector.Children.Add(ShadlerUIElement.CreateShadlerEpisodeButton(episodeString));
                         }
                     }
                 }
@@ -95,6 +113,54 @@ namespace Shadler.Views
                 ContentYear.Text = currentContent.Year;
                 ContentThumbnail.Source = currentContent.Thumbnail;
 
+            }
+        }
+
+        private void ContentPage_KeyPressed(object sender, KeyRoutedEventArgs args)
+        {
+            if (args.Key == Windows.System.VirtualKey.Enter)
+            {
+                var pageBox = sender as TextBox;
+
+                if (int.TryParse(pageBox?.Text, out pageIndex)) {
+
+                    pageIndex -= 1;
+                    EpisodeSelector.Children.Clear();
+
+                    foreach (string episodeString in episodePages[pageIndex])
+                    {
+                        Console.WriteLine(episodeString);
+                        EpisodeSelector.Children.Add(ShadlerUIElement.CreateShadlerEpisodeButton(episodeString));
+                    }
+
+                    pageBox.Text = pageIndex.ToString();
+
+                } else
+                {
+                    return;
+                }
+            }
+        }
+
+        private void NextPageClick(object sender, RoutedEventArgs args)
+        {
+            pageIndex += 1;
+            EpisodeSelector.Children.Clear();
+
+            foreach (string episodeString in episodePages[pageIndex])
+            {
+                EpisodeSelector.Children.Add(ShadlerUIElement.CreateShadlerEpisodeButton(episodeString));
+            }
+        }
+
+        private void PreviousPageClick(object sender, RoutedEventArgs args)
+        {
+            pageIndex -= 1;
+            EpisodeSelector.Children.Clear();
+
+            foreach (string episodeString in episodePages[pageIndex])
+            {
+                EpisodeSelector.Children.Add(ShadlerUIElement.CreateShadlerEpisodeButton(episodeString));
             }
         }
     }
