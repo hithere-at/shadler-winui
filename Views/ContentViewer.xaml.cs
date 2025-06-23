@@ -39,12 +39,14 @@ namespace Shadler.Views
 
         List<List<string>> episodePages = new List<List<string>>();
         int pageIndex = 0;
+        ShadlerPlayerContent playerContent = new ShadlerPlayerContent();
 
-        protected override async void OnNavigatedTo(NavigationEventArgs args) {
+        protected override async void OnNavigatedTo(NavigationEventArgs args)
+        {
 
             base.OnNavigatedTo(args);
 
-            if (args.Parameter is ShadlerContent currentContent)
+            if (args.Parameter is ShadlerGeneralContent currentContent)
             {
 
                 using (HttpClient client = new HttpClient())
@@ -62,6 +64,8 @@ namespace Shadler.Views
                             VerticalAlignment = VerticalAlignment.Center,
                             HorizontalAlignment = HorizontalAlignment.Center,
                         });
+
+                        return;
                     }
 
                     string responseData = await response.Content.ReadAsStringAsync();
@@ -104,10 +108,16 @@ namespace Shadler.Views
 
                         foreach (string episodeString in episodePages[0])
                         {
-                            EpisodeSelector.Children.Add(ShadlerUIElement.CreateShadlerEpisodeButton(episodeString));
+                            Grid episodeButton = ShadlerUIElement.CreateShadlerEpisodeButton(episodeString, PlayButton_Click);
+                            EpisodeSelector.Children.Add(episodeButton);
                         }
                     }
                 }
+
+                playerContent.ContentType = currentContent.ContentType;
+                playerContent.Id = currentContent.Id;
+                playerContent.Title = currentContent.Title;
+                playerContent.Year = currentContent.Year;
 
                 ContentTitle.Text = currentContent.Title;
                 ContentYear.Text = currentContent.Year;
@@ -122,20 +132,21 @@ namespace Shadler.Views
             {
                 var pageBox = sender as TextBox;
 
-                if (int.TryParse(pageBox?.Text, out pageIndex)) {
+                if (int.TryParse(pageBox?.Text, out pageIndex))
+                {
 
                     pageIndex -= 1;
                     EpisodeSelector.Children.Clear();
 
                     foreach (string episodeString in episodePages[pageIndex])
                     {
-                        Console.WriteLine(episodeString);
-                        EpisodeSelector.Children.Add(ShadlerUIElement.CreateShadlerEpisodeButton(episodeString));
+                        EpisodeSelector.Children.Add(ShadlerUIElement.CreateShadlerEpisodeButton(episodeString, PlayButton_Click));
                     }
 
                     pageBox.Text = pageIndex.ToString();
 
-                } else
+                }
+                else
                 {
                     return;
                 }
@@ -149,7 +160,7 @@ namespace Shadler.Views
 
             foreach (string episodeString in episodePages[pageIndex])
             {
-                EpisodeSelector.Children.Add(ShadlerUIElement.CreateShadlerEpisodeButton(episodeString));
+                EpisodeSelector.Children.Add(ShadlerUIElement.CreateShadlerEpisodeButton(episodeString, PlayButton_Click));
             }
         }
 
@@ -160,8 +171,29 @@ namespace Shadler.Views
 
             foreach (string episodeString in episodePages[pageIndex])
             {
-                EpisodeSelector.Children.Add(ShadlerUIElement.CreateShadlerEpisodeButton(episodeString));
+                EpisodeSelector.Children.Add(ShadlerUIElement.CreateShadlerEpisodeButton(episodeString, PlayButton_Click));
             }
+        }
+
+        private void PlayButton_Click(object sender, RoutedEventArgs args)
+        {
+            ContentDetails.Children.Clear();
+
+            var button = sender as Button;
+
+            string episodeString = button.Tag.ToString();
+            playerContent.Episode = episodeString;
+
+            playerContent.StreamsUrl = playerContent.ContentType == "Anime"
+                ? Anime.GetStreamUrl(playerContent.Id, episodeString)
+                : Manga.GetStreamUrl(playerContent.Id, episodeString);
+
+            PlayerViewerFrame.Navigate(typeof(ContentPlayer), playerContent);
+        }
+
+        private void DownloadButton_Click(object sender, RoutedEventArgs args)
+        {
+            return; // TODO: implement downloader
         }
     }
 }

@@ -35,8 +35,8 @@ namespace Shadler.Views
     public sealed partial class Browser : Page
     {
         string currentContentType = "Anime";
-        string currentQuery;
-        List<ShadlerContent> shadlerContents = new List<ShadlerContent>();
+        string currentQuery = string.Empty;
+        List<ShadlerGeneralContent> shadlerContents = new List<ShadlerGeneralContent>();
         
         public Browser()
         {
@@ -115,12 +115,12 @@ namespace Shadler.Views
                         foreach (JsonElement content in contentResults.EnumerateArray())
                         {
 
-                            string id = content.GetProperty("_id").GetString();
-                            string title = content.GetProperty("name").GetString();
+                            string? id = content.GetProperty("_id").GetString();
+                            string? title = content.GetProperty("name").GetString();
                             string year;
 
-                            string thumbnailUrl = content.GetProperty("thumbnail").GetString();
-                            thumbnailUrl = !(thumbnailUrl.StartsWith("https://"))
+                            string? thumbnailUrl = content.GetProperty("thumbnail").GetString();
+                            thumbnailUrl = !thumbnailUrl.StartsWith("https://")
                                 ? "https://aln.youtube-anime.com/" + thumbnailUrl
                                 : thumbnailUrl;
 
@@ -142,7 +142,7 @@ namespace Shadler.Views
                             BitmapImage thumbnailImage = new BitmapImage(new Uri(thumbnailUrl));
 
                             Button currContentButton = ShadlerUIElement.CreateShadlerContent(title, year, thumbnailImage, count.ToString());
-                            ShadlerContent currContent = new ShadlerContent(currentContentType, id, title, year, thumbnailImage, detailUrl);
+                            ShadlerGeneralContent currContent = new ShadlerGeneralContent(currentContentType, id, title, year, thumbnailImage, detailUrl);
 
                             currContentButton.Click += SelectContent_Event;
                             ContentGrid.Children.Add(currContentButton);
@@ -211,7 +211,7 @@ namespace Shadler.Views
             { 
                 int index = int.Parse(shadlerContentButton.Tag.ToString());
 
-                ContentViewerFrame.Navigate(typeof(ContentViewer), shadlerContents[index], new EntranceNavigationTransitionInfo());
+                ContentViewerFrame.Navigate(typeof(ContentViewer), shadlerContents[index]);
 
             }
 

@@ -92,7 +92,7 @@ namespace Shadler.UI
             return button;
         }
 
-        public static Grid CreateShadlerEpisodeButton(string episode)
+        public static Grid CreateShadlerEpisodeButton(string episode, RoutedEventHandler playButtonEvent)
         {
             Grid episodeViewerGrid = new Grid
             {
@@ -137,6 +137,8 @@ namespace Shadler.UI
                     Glyph = "\uE896"
                 }
             };
+
+            playButton.Click += playButtonEvent;
 
             Grid.SetColumn(episodeString, 0);
             Grid.SetColumn(playButton, 1);

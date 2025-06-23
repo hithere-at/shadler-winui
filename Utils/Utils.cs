@@ -34,9 +34,9 @@ namespace Shadler.Utils
             return fullUrl;
         }
 
-        public static string GetStreamUrl(string id, int episode)
+        public static string GetStreamUrl(string id, string episode)
         {
-            string streamVar = ANIME_STREAM_VARS.Replace("#ANIME_ID#", id).Replace("#EPISODE#", episode.ToString());
+            string streamVar = ANIME_STREAM_VARS.Replace("#ANIME_ID#", id).Replace("#EPISODE#", episode);
             string extVar = API_EXT.Replace("#HASH#", ANIME_STREAM_HASH);
             string fullUrl = "https://api.allanime.day/api?variables=" + streamVar + "&extensions=" + extVar;
 
@@ -76,9 +76,9 @@ namespace Shadler.Utils
             return fullUrl;
         }
 
-        public static string GetStreamUrl(string id, int chapter)
+        public static string GetStreamUrl(string id, string chapter)
         {
-            string streamVar = MANGA_READ_VARS.Replace("#ANIME_ID#", id).Replace("#EPISODE#", chapter.ToString());
+            string streamVar = MANGA_READ_VARS.Replace("#ANIME_ID#", id).Replace("#EPISODE#", chapter);
             string extVar = API_EXT.Replace("#HASH#", MANGA_READ_HASH);
             string fullUrl = "https://api.allanime.day/api?variables=" + streamVar + "&extensions=" + extVar;
 
