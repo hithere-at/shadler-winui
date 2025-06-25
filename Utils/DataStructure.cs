@@ -34,6 +34,7 @@ namespace Shadler.DataStructure
         public string Title { get; set; }
         public string Year { get; set; }
         public string Episode { get; set; }
+        public List<string> AvailableEpisodes { get; set; }
         public string StreamsUrl { get; set; }
 
         public ShadlerPlayerContent()
@@ -43,6 +44,7 @@ namespace Shadler.DataStructure
             Title = string.Empty;
             Year = string.Empty;
             Episode = string.Empty;
+            AvailableEpisodes = new List<string>();
             StreamsUrl = string.Empty;
         }
         public ShadlerPlayerContent(string contentType, string id, string title, string year, string episode, string contentUrl)

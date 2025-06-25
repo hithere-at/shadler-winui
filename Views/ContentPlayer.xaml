@@ -23,7 +23,7 @@
 
         <MediaPlayerElement x:Name="ContentPlayerElement" Height="400" Grid.Row="1" HorizontalAlignment="Center" AreTransportControlsEnabled="True" />
 
-        <Grid>
+        <Grid Grid.Row="2">
             
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -31,9 +31,9 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Button Click="PreviousEpisodeClick" Content="Previous" HorizontalAlignment="Left"/>
-            <Button Click="FullScreenClick" Content="Watch in FullScreen" HorizontalAlignment="Center"/>
-            <Button Click="NextEpisodeClick" Content="Next" HorizontalAlignment="Right"/>
+            <Button x:Name="PreviousButton"  Click="PreviousEpisodeClick" Content="Previous" HorizontalAlignment="Left"/>
+            <Button Grid.Column="1" Click="FullScreenClick" Content="Watch in Fullscreen" HorizontalAlignment="Center"/>
+            <Button x:Name="NextButton" Grid.Column="2" Click="NextEpisodeClick" Content="Next" HorizontalAlignment="Right"/>
 
         </Grid>
 

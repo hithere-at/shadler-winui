@@ -92,9 +92,11 @@ namespace Shadler.Views
 
                         int episodesLength = episodeStrings.GetArrayLength() - 1;
                         List<string> pageHelper = new List<string>();
+                        List<string> availableEpisodes = new List<string>();
 
                         foreach (JsonElement episode in episodeStrings.EnumerateArray())
                         {
+                            availableEpisodes.Add(episode.ToString());
                             pageHelper.Add(episode.ToString());
 
                             if ((count != 0 && count % 15 == 0) || count == episodesLength)
@@ -111,6 +113,9 @@ namespace Shadler.Views
                             Grid episodeButton = ShadlerUIElement.CreateShadlerEpisodeButton(episodeString, PlayButton_Click);
                             EpisodeSelector.Children.Add(episodeButton);
                         }
+
+                        playerContent.AvailableEpisodes = new List<string>(availableEpisodes);
+
                     }
                 }
 
